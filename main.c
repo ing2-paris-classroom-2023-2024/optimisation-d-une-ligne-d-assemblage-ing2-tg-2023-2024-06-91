@@ -1,6 +1,5 @@
-//
-// Created by boraz on 22/11/2023.
-//
+/***********************************************BORAZ BOUCHANE VALLETTE SETTBON**************************************************************************/
+/********************************PROJET théorie des graphes : optimisation d'une ligne d'assemblage groupe 91******************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
