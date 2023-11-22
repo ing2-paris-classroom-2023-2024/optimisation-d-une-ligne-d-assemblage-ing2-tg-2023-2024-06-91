@@ -7,5 +7,7 @@
 
 int main(){
     printf("debut du projet\n");
-    printf("commencement de la théorie des graphes\n");
+    printf("commencement de la theorie des graphes\n");
+    printf("premier commit de toute ma vie\n");
+
 }
