@@ -201,3 +201,42 @@ void Kruskal(t_graphe*  graphe)
 
 
 
+
+
+
+
+
+
+ while(numencours<graphe->ordre-1)
+    {
+        if(t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex!=t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex)
+        {
+            for(int k=0;k<graphe->ordre;k++)
+            {
+                if(t_sommet_temp[k].comp_connex==t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex && t_sommet_temp[k].num_sommet!=t_sommet_temp[Tablo_arretes[nbarete].arrivee].num_sommet)
+                {
+                    t_sommet_temp[k].comp_connex=t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex;
+                }
+            }
+//Affichage 1
+            t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex=t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex;
+            printf("\nSommet de Depart  %d ---> Sommet d'Arrivee  %d ",t_sommet_temp[Tablo_arretes[nbarete].depart].num_sommet,t_sommet_temp[Tablo_arretes[nbarete].arrivee].num_sommet);
+            Poids_total+=Tablo_arretes[nbarete].poids;
+            numencours++;
+        }
+        nbarete++;
+    }
+//Affichage 2
+    printf("\n\n");
+
+    for(int j=0;j<graphe->ordre;j++)
+    {
+        printf("\n\tSommet : %d = composante connexe %d",t_sommet_temp[j].num_sommet,t_sommet_temp[j].comp_connex);
+    }
+
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+
+
+}
+
+
