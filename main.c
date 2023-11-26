@@ -210,6 +210,99 @@ void dijkstra(int graph[V][V], int src) {
         // Choix du sommet ayant la plus petite distance non incluse dans l'arbre des plus courts chemins
         int u = trouverMinDistance(distance, sptSet);
 
+
+Bien sûr ! Voici un exemple de code en C pour l'algorithme de Dijkstra. Cependant, il est important de noter que cet exemple suppose que le graphe est pondéré et représenté par une matrice d'adjacence.
+
+```c
+#include <stdio.h>
+#include <limits.h>
+
+#define V 6 // Nombre de sommets dans le graphe
+
+// Fonction pour trouver le sommet avec la distance minimale
+int trouverSommetMinimum(int distance[], int ensembleSommets[])
+{
+    int min = INT_MAX, min_index;
+
+    for (int v = 0; v < V; v++)
+    {
+        if (ensembleSommets[v] == 0 && distance[v] <= min)
+        {
+            min = distance[v];
+            min_index = v;
+        }
+    }
+
+    return min_index;
+}
+
+// Fonction pour afficher la solution après l'exécution de l'algorithme de Dijkstra
+void afficherSolution(int distance[])
+{
+    printf("Sommet \t Distance depuis le sommet source\n");
+    for (int i = 0; i < V; i++)
+        printf("%d \t %d\n", i, distance[i]);
+}
+
+// Fonction qui implémente l'algorithme de Dijkstra pour un graphe représenté par une matrice d'adjacence
+void dijkstra(int graphe[V][V], int source)
+{
+    int distance[V]; // Tableau pour stocker les distances les plus courtes depuis la source jusqu'à chaque sommet
+    int ensembleSommets[V]; // Tableau pour suivre les sommets inclus dans l'ensemble de sommets déjà traités
+
+    // Initialisation des distances et de l'ensemble des sommets
+    for (int i = 0; i < V; i++)
+    {
+        distance[i] = INT_MAX;
+        ensembleSommets[i] = 0;
+    }
+
+    // La distance de la source vers elle-même est toujours 0
+    distance[source] = 0;
+
+    // Recherche de la plus courte distance pour tous les sommets
+    for (int count = 0; count < V - 1; count++)
+    {
+        // Choix du sommet avec la distance minimale depuis l'ensemble des sommets encore non traités
+        int u = trouverSommetMinimum(distance, ensembleSommets);
+
+        // Marquer le sommet choisi comme traité
+        ensembleSommets[u] = 1;
+
+        // Mettre à jour la distance des sommets adjacents au sommet choisi
+        for (int v = 0; v < V; v++)
+        {
+            if (!ensembleSommets[v] && graphe[u][v] && distance[u] != INT_MAX &&
+                distance[u] + graphe[u][v] < distance[v])
+            {
+                distance[v] = distance[u] + graphe[u][v];
+            }
+        }
+    }
+
+    // Afficher la solution
+    afficherSolution(distance);
+}
+
+int main()
+{
+    // Exemple de graphe pondéré représenté par une matrice d'adjacence
+    int graphe[V][V] = {
+        {0, 5, 0, 0, 0, 0},
+        {0, 0, 0, 4, 0, 0},
+        {0, 0, 0, 0, 7, 0},
+        {0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 6},
+        {0, 0, 0, 0, 0, 0}};
+
+    // Appeler l'algorithme de Dijkstra avec le sommet source 0
+    dijkstra(graphe, 0);
+
+    return 0;
+}
+```
+
+Dans cet exemple, le graphe est un graphe pondéré avec 6 sommets, représenté par une matrice d'adjacence. Vous pouvez adapter le code en fonction de votre graphe spécifique si vous en avez un différent.
         
 
 
