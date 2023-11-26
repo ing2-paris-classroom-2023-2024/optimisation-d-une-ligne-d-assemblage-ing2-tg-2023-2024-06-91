@@ -164,6 +164,53 @@ void Kruskal(t_graphe*  graphe)
 
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define V 6  // Nombre de sommets dans le graphe
+
+// Fonction pour trouver le sommet avec la distance minimale
+int trouverMinDistance(int distance[], int sptSet[]) {
+    int min = INT_MAX, min_index;
+
+    for (int v = 0; v < V; v++) {
+        if (sptSet[v] == 0 && distance[v] <= min) {
+            min = distance[v];
+            min_index = v;
+        }
+    }
+
+    return min_index;
+}
+
+// Fonction pour afficher le tableau des distances
+void afficherSolution(int distance[]) {
+    printf("Sommet \t Distance depuis le sommet source\n");
+    for (int i = 0; i < V; i++)
+        printf("%d \t %d\n", i, distance[i]);
+}
+
+// Fonction qui implémente l'algorithme de Dijkstra pour un graphe représenté par une matrice d'adjacence
+void dijkstra(int graph[V][V], int src) {
+    int distance[V];  // tableau pour stocker les distances les plus courtes depuis la source
+    int sptSet[V];    // tableau pour indiquer si un sommet a déjà été inclus dans l'arbre des plus courts chemins
+
+    // Initialiser toutes les distances comme infinies et aucun sommet n'a été inclus dans l'arbre des plus courts chemins
+    for (int i = 0; i < V; i++) {
+        distance[i] = INT_MAX;
+        sptSet[i] = 0;
+    }
+
+    // La distance de la source à elle-même est toujours 0
+    distance[src] = 0;
+
+    // Trouver le plus court chemin pour tous les sommets
+    for (int count = 0; count < V - 1; count++) {
+        // Choix du sommet ayant la plus petite distance non incluse dans l'arbre des plus courts chemins
+        int u = trouverMinDistance(distance, sptSet);
+
+        
 
 
 
