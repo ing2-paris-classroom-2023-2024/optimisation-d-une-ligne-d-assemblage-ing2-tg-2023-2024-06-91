@@ -305,7 +305,16 @@ int main()
 Dans cet exemple, le graphe est un graphe pondéré avec 6 sommets, représenté par une matrice d'adjacence. Vous pouvez adapter le code en fonction de votre graphe spécifique si vous en avez un différent.
         
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 
+#define V 6  // Nombre de sommets dans le graphe
+
+// Fonction utilitaire pour trouver le sommet avec la distance minimale
+// parmi les sommets non encore inclus dans le plus court chemin calculé
+int trouverMinimumDistance(int distance[], int inclusDansPlusCourtChemin[]) {
+    int min = INT_MAX, min_index;
 
 
 
