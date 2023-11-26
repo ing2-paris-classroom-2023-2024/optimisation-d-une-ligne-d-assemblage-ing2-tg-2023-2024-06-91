@@ -64,4 +64,7 @@ void prim(t_graphe* graphe, t_sommet** sommet, t_arc* arc,int sommet_initial)
 
     }
     printf("\nLe poids total minimal est : %d\n\n", poids_total); //Affichage de
+    printf("\nLe poids total minimal est : %d\n\n", poids_total); //Affichage de
 }
+///encore un commit
+///x2
