@@ -270,6 +270,7 @@ void Kruskal(t_graphe*  graphe)
     printf("\n\npoids total :  %d\n\n",Poids_total);
     printf("\n\npoids total :  %d\n\n",Poids_total);
     printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
 }
 
 
