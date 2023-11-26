@@ -323,6 +323,20 @@ for (int v = 0; v < V; v++) {
         }
     }
 
+
+
+    / Fonction utilitaire pour afficher le tableau des distances calculées
+void afficherSolution(int distance[]) {
+    printf("Sommet \t Distance depuis le sommet source\n");
+    for (int i = 0; i < V; i++)
+        printf("%d \t %d\n", i, distance[i]);
+}
+
+// Fonction principale implémentant l'algorithme de Dijkstra pour un graphe donné
+void dijkstra(int graphe[V][V], int src) {
+    int distance[V];  // Tableau pour stocker les distances les plus courtes du sommet source à chaque sommet
+    int inclusDansPlusCourtChemin[V];  // Tableau pour indiquer si le sommet est inclus dans le plus court chemin
+
     return min_index;
 }
 
