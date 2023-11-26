@@ -316,6 +316,15 @@ Dans cet exemple, le graphe est un graphe pondéré avec 6 sommets, représenté
 int trouverMinimumDistance(int distance[], int inclusDansPlusCourtChemin[]) {
     int min = INT_MAX, min_index;
 
+for (int v = 0; v < V; v++) {
+        if (!inclusDansPlusCourtChemin[v] && distance[v] <= min) {
+            min = distance[v];
+            min_index = v;
+        }
+    }
+
+    return min_index;
+}
 
 
 
