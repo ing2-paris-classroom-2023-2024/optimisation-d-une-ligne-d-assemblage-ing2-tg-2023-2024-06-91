@@ -4,6 +4,8 @@
 
 #include "header.h"
 
+
+
 int main(){
     printf("debut du projet\n");
     printf("commencement de la theorie des graphes\n");
@@ -12,6 +14,44 @@ int main(){
 }
 
 
+/// structures du graphe
+
+typedef struct arc
+{
+    int sommet;
+    int valeur;
+    int poids;
+    struct _arc* arc_suivant;
+}t_arc;
+
+typedef struct sommet
+{
+    t_arc* arc;
+    int valeur;
+    int marque;
+    int pre;
+    int dist;
+    int degre;
+}t_sommet;
+
+typedef struct Graphe
+{
+    int taille;
+    int ordre;
+    t_sommet** pSommet;
+}t_graphe;
+typedef struct arrete_temp
+{
+    int depart;
+    int arrivee;
+    int poids;
+}t_arrete_temp;
+
+typedef struct sommet_temp
+{
+    int num_sommet;
+    int comp_connex;
+}t_sommet_temp;
 
 // Fonction permettant de trier et de ranger dans l'ordre croissant les poids des différentes arêtes.
 void tri_poids(t_graphe * graphe,t_arrete_temp Tablo_arretes[])
@@ -161,6 +201,84 @@ void Kruskal(t_graphe*  graphe)
 }
 
 
+    while(1) ///Creation d'un menu, on fait une boucle infinie
+    {
+        if(choix==-1)
+        {
+            exit(0);
+        }
+        if(choix==0) //Premier test pour le menu principale
+        {
+            system("cls");
+            ///Différents choix dans le menu
+            printf("1- Ouverture du graphe.\n");
+            printf("2- Afficher l'algorithme de Prim \n");
+            printf("3- Afficher l'algorithme de Kruskal\n");
+            printf("4- Quitter. \n");
+            printf("Entrez votre choix :");
+            scanf("%d",&choix);
+        }
+        if(choix==1) //Choix numero 1
+        {
+            system("cls");
+            t_graphe* graphe=extraire_graphe(); //Extraction du graphe
+            affiche_g(graphe); //affichage du graphe
+            printf("Entrez 0 pour revenir au menu : ");
+            scanf("%d",&choix);
+            while(choix!=0)
+            {
+                system("cls");
+                printf("Vous avez entre une valeur differente de 0:");
+                scanf("%d",&choix);
+            }
+        }
+
+        if(choix==2) //Choix numero 2
+        {
+            t_graphe* graphe=extraire_graphe();
+            int sommet_init=0;
+            printf("Entrez le sommet par lequel vous souhaitez commencer : ");
+            scanf("%d",&sommet_init);
+            while(sommet_init<0 || sommet_init>graphe->ordre)
+            {
+                printf("Le sommet selectionne n'existe pas, veuillez choisir entre 0 et %d:", graphe->ordre);
+                scanf("%d",&sommet_init);
+            }
+            printf("%d\n",graphe->taille);
+            prim(graphe,sommet,arc,sommet_init);
+            //quitter le programme
+            printf("Entrez 0 pour revenir au menu : ");
+            scanf("%d",&choix);
+            while(choix!=0)
+            {
+                system("cls");
+                printf("Vous avez entre une valeur differente de 0:");
+                scanf("%d",&choix);
+            }
+        }
+        if(choix==3) //Choix numero 2
+        {
+            t_graphe* graphe=extraire_graphe();
+            int sommet_init=0;
+            Kruskal(graphe);
+            //quitter le programme
+            printf("Entrez 0 pour revenir au menu : ");
+            scanf("%d",&choix);
+            while(choix!=0)
+            {
+                system("cls");
+                printf("Vous avez entre une valeur differente de 0:");
+                scanf("%d",&choix);
+            }
+        }
+        if(choix==4) //Choix numero 3
+        {
+            system("cls");
+            choix=-1;
+        }
+
+    }
+}
 
 
 
@@ -304,6 +422,10 @@ int main()
 
 Dans cet exemple, le graphe est un graphe pondéré avec 6 sommets, représenté par une matrice d'adjacence. Vous pouvez adapter le code en fonction de votre graphe spécifique si vous en avez un différent.
         
+#include "header.h"
+
+int main()
+{
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -323,6 +445,9 @@ for (int v = 0; v < V; v++) {
         }
     }
 
+    t_sommet** sommet;
+    t_arc* arc;
+    int choix =0;
 
 
     / Fonction utilitaire pour afficher le tableau des distances calculées
