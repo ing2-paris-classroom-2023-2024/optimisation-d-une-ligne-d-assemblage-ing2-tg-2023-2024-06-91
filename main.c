@@ -14,45 +14,117 @@ int main(){
 }
 
 
-/// structures du graphe
-
-typedef struct arc
+/// Fonction pour afficher les successeurs d'un sommet donné dans le graphe.
+void successeur(t_sommet** sommet, int num)
 {
-    int sommet;
-    int valeur;
-    int poids;
-    struct _arc* arc_suivant;
-}t_arc;
+    // Accéder à la liste d'arêtes du sommet.
+    printf(" sommet %d :\n",num);
 
-typedef struct sommet
-{
-    t_arc* arc;
-    int valeur;
-    int marque;
-    int pre;
-    int dist;
-    int degre;
-}t_sommet;
+    t_arc* arc=sommet[num]->arc;
 
-typedef struct Graphe
-{
-    int taille;
-    int ordre;
-    t_sommet** pSommet;
-}t_graphe;
-typedef struct arrete_temp
-{
-    int depart;
-    int arrivee;
-    int poids;
-}t_arrete_temp;
+    while(arc!=NULL)
+    {
+        printf("\t successeur: %d | poids : %d  \n",arc->sommet,arc->poids);
+        arc=arc->arc_suivant;
+    }
 
-typedef struct sommet_temp
-{
-    int num_sommet;
-    int comp_connex;
-}t_sommet_temp;
+}
 
+// Fonction pour créer une arête entre deux sommets du graphe avec un poids donné.
+t_sommet** Creer_a(t_sommet** sommet,int s1,int s2, int poids)
+{
+    if(sommet[s1]->arc==NULL)
+    {
+        t_arc* n_arc=(t_arc*)malloc(sizeof(t_arc));
+        n_arc->sommet=s2;
+        n_arc->poids=poids;
+        n_arc->arc_suivant=NULL;
+        sommet[s1]->arc=n_arc;
+        return sommet;
+    }
+    else
+    {
+        t_arc* temp=sommet[s1]->arc;
+        while( !(temp->arc_suivant==NULL))
+        {
+            temp=temp->arc_suivant;
+        }
+        t_arc* n_arc=(t_arc*)malloc(sizeof(t_arc));
+        n_arc->sommet=s2;
+        n_arc->poids=poids;
+        n_arc->arc_suivant=NULL;
+
+        temp->arc_suivant=n_arc;
+        return sommet;
+    }
+}
+
+// Créer un nouveau graphe avec un certain nombre de sommets (ordre).
+t_graphe* creation_graphe(int ordre)
+{
+    t_graphe * n_graphe=(t_graphe*)malloc(sizeof(t_graphe));
+    n_graphe->pSommet = (t_sommet**)malloc(ordre*sizeof(t_sommet*));
+
+    for(int i=0; i<ordre; i++)
+    {
+        n_graphe->pSommet[i]=(t_sommet*)malloc(sizeof(t_sommet));
+        n_graphe->pSommet[i]->valeur=i;
+        n_graphe->pSommet[i]->marque=0;
+        n_graphe->pSommet[i]->degre=0;
+        n_graphe->pSommet[i]->pre=-1;
+        n_graphe->pSommet[i]->arc=NULL;
+    }
+    return n_graphe;
+}
+
+// Extraire un graphe à partir d'un fichier texte.
+t_graphe* extraire_graphe()
+{
+    t_graphe* graphe;
+    FILE * ifs = fopen("grapheTP5.txt","r");
+    int taille, ordre, s1, s2, poids;
+
+    if (!ifs)
+    {
+        printf("Erreur de lecture fichier\n");
+        exit(-1);
+    }
+
+    fscanf(ifs,"%d",&ordre);
+    fscanf(ifs,"%d",&taille);
+    graphe=creation_graphe(ordre);
+
+
+    graphe->ordre=ordre;
+    graphe->taille=taille;
+
+    for (int i=0; i<taille; ++i)
+    {
+        fscanf(ifs,"   %d %d %d",&s1,&s2,&poids);
+        graphe->pSommet=Creer_a(graphe->pSommet, s1, s2,poids);
+
+
+        graphe->pSommet=Creer_a(graphe->pSommet, s2, s1, poids);
+    }
+
+    return graphe;
+}
+
+// Afficher le graphe avec les successeurs de chaque sommet.
+void affiche_g(t_graphe* graphe)
+{
+    printf("graphe\n");
+
+
+    printf("ordre = %d\n",graphe->ordre);
+
+    printf("listes d'adjacence :\n");
+
+    for (int i=0; i<graphe->ordre; i++)
+    {
+        successeur(graphe->pSommet, i);
+        printf("\n");
+    }
 // Fonction permettant de trier et de ranger dans l'ordre croissant les poids des différentes arêtes.
 void tri_poids(t_graphe * graphe,t_arrete_temp Tablo_arretes[])
 {
@@ -199,271 +271,5 @@ void Kruskal(t_graphe*  graphe)
 
 
 }
-
-
-    while(1) ///Creation d'un menu, on fait une boucle infinie
-    {
-        if(choix==-1)
-        {
-            exit(0);
-        }
-        if(choix==0) //Premier test pour le menu principale
-        {
-            system("cls");
-            ///Différents choix dans le menu
-            printf("1- Ouverture du graphe.\n");
-            printf("2- Afficher l'algorithme de Prim \n");
-            printf("3- Afficher l'algorithme de Kruskal\n");
-            printf("4- Quitter. \n");
-            printf("Entrez votre choix :");
-            scanf("%d",&choix);
-        }
-        if(choix==1) //Choix numero 1
-        {
-            system("cls");
-            t_graphe* graphe=extraire_graphe(); //Extraction du graphe
-            affiche_g(graphe); //affichage du graphe
-            printf("Entrez 0 pour revenir au menu : ");
-            scanf("%d",&choix);
-            while(choix!=0)
-            {
-                system("cls");
-                printf("Vous avez entre une valeur differente de 0:");
-                scanf("%d",&choix);
-            }
-        }
-
-        if(choix==2) //Choix numero 2
-        {
-            t_graphe* graphe=extraire_graphe();
-            int sommet_init=0;
-            printf("Entrez le sommet par lequel vous souhaitez commencer : ");
-            scanf("%d",&sommet_init);
-            while(sommet_init<0 || sommet_init>graphe->ordre)
-            {
-                printf("Le sommet selectionne n'existe pas, veuillez choisir entre 0 et %d:", graphe->ordre);
-                scanf("%d",&sommet_init);
-            }
-            printf("%d\n",graphe->taille);
-            prim(graphe,sommet,arc,sommet_init);
-            //quitter le programme
-            printf("Entrez 0 pour revenir au menu : ");
-            scanf("%d",&choix);
-            while(choix!=0)
-            {
-                system("cls");
-                printf("Vous avez entre une valeur differente de 0:");
-                scanf("%d",&choix);
-            }
-        }
-        if(choix==3) //Choix numero 2
-        {
-            t_graphe* graphe=extraire_graphe();
-            int sommet_init=0;
-            Kruskal(graphe);
-            //quitter le programme
-            printf("Entrez 0 pour revenir au menu : ");
-            scanf("%d",&choix);
-            while(choix!=0)
-            {
-                system("cls");
-                printf("Vous avez entre une valeur differente de 0:");
-                scanf("%d",&choix);
-            }
-        }
-        if(choix==4) //Choix numero 3
-        {
-            system("cls");
-            choix=-1;
-        }
-
-    }
-}
-
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-
-#define V 6  // Nombre de sommets dans le graphe
-
-// Fonction pour trouver le sommet avec la distance minimale
-int trouverMinDistance(int distance[], int sptSet[]) {
-    int min = INT_MAX, min_index;
-
-    for (int v = 0; v < V; v++) {
-        if (sptSet[v] == 0 && distance[v] <= min) {
-            min = distance[v];
-            min_index = v;
-        }
-    }
-
-    return min_index;
-}
-
-// Fonction pour afficher le tableau des distances
-void afficherSolution(int distance[]) {
-    printf("Sommet \t Distance depuis le sommet source\n");
-    for (int i = 0; i < V; i++)
-        printf("%d \t %d\n", i, distance[i]);
-}
-
-// Fonction qui implémente l'algorithme de Dijkstra pour un graphe représenté par une matrice d'adjacence
-void dijkstra(int graph[V][V], int src) {
-    int distance[V];  // tableau pour stocker les distances les plus courtes depuis la source
-    int sptSet[V];    // tableau pour indiquer si un sommet a déjà été inclus dans l'arbre des plus courts chemins
-
-    // Initialiser toutes les distances comme infinies et aucun sommet n'a été inclus dans l'arbre des plus courts chemins
-    for (int i = 0; i < V; i++) {
-        distance[i] = INT_MAX;
-        sptSet[i] = 0;
-    }
-
-    // La distance de la source à elle-même est toujours 0
-    distance[src] = 0;
-
-    // Trouver le plus court chemin pour tous les sommets
-    for (int count = 0; count < V - 1; count++) {
-        // Choix du sommet ayant la plus petite distance non incluse dans l'arbre des plus courts chemins
-        int u = trouverMinDistance(distance, sptSet);
-
-
-Bien sûr ! Voici un exemple de code en C pour l'algorithme de Dijkstra. Cependant, il est important de noter que cet exemple suppose que le graphe est pondéré et représenté par une matrice d'adjacence.
-
-```c
-#include <stdio.h>
-#include <limits.h>
-
-#define V 6 // Nombre de sommets dans le graphe
-
-// Fonction pour trouver le sommet avec la distance minimale
-int trouverSommetMinimum(int distance[], int ensembleSommets[])
-{
-    int min = INT_MAX, min_index;
-
-    for (int v = 0; v < V; v++)
-    {
-        if (ensembleSommets[v] == 0 && distance[v] <= min)
-        {
-            min = distance[v];
-            min_index = v;
-        }
-    }
-
-    return min_index;
-}
-
-// Fonction pour afficher la solution après l'exécution de l'algorithme de Dijkstra
-void afficherSolution(int distance[])
-{
-    printf("Sommet \t Distance depuis le sommet source\n");
-    for (int i = 0; i < V; i++)
-        printf("%d \t %d\n", i, distance[i]);
-}
-
-// Fonction qui implémente l'algorithme de Dijkstra pour un graphe représenté par une matrice d'adjacence
-void dijkstra(int graphe[V][V], int source)
-{
-    int distance[V]; // Tableau pour stocker les distances les plus courtes depuis la source jusqu'à chaque sommet
-    int ensembleSommets[V]; // Tableau pour suivre les sommets inclus dans l'ensemble de sommets déjà traités
-
-    // Initialisation des distances et de l'ensemble des sommets
-    for (int i = 0; i < V; i++)
-    {
-        distance[i] = INT_MAX;
-        ensembleSommets[i] = 0;
-    }
-
-    // La distance de la source vers elle-même est toujours 0
-    distance[source] = 0;
-
-    // Recherche de la plus courte distance pour tous les sommets
-    for (int count = 0; count < V - 1; count++)
-    {
-        // Choix du sommet avec la distance minimale depuis l'ensemble des sommets encore non traités
-        int u = trouverSommetMinimum(distance, ensembleSommets);
-
-        // Marquer le sommet choisi comme traité
-        ensembleSommets[u] = 1;
-
-        // Mettre à jour la distance des sommets adjacents au sommet choisi
-        for (int v = 0; v < V; v++)
-        {
-            if (!ensembleSommets[v] && graphe[u][v] && distance[u] != INT_MAX &&
-                distance[u] + graphe[u][v] < distance[v])
-            {
-                distance[v] = distance[u] + graphe[u][v];
-            }
-        }
-    }
-
-    // Afficher la solution
-    afficherSolution(distance);
-}
-
-int main()
-{
-    // Exemple de graphe pondéré représenté par une matrice d'adjacence
-    int graphe[V][V] = {
-        {0, 5, 0, 0, 0, 0},
-        {0, 0, 0, 4, 0, 0},
-        {0, 0, 0, 0, 7, 0},
-        {0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 6},
-        {0, 0, 0, 0, 0, 0}};
-
-    // Appeler l'algorithme de Dijkstra avec le sommet source 0
-    dijkstra(graphe, 0);
-
-    return 0;
-}
-```
-
-Dans cet exemple, le graphe est un graphe pondéré avec 6 sommets, représenté par une matrice d'adjacence. Vous pouvez adapter le code en fonction de votre graphe spécifique si vous en avez un différent.
-        
-#include "header.h"
-
-int main()
-{
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-
-#define V 6  // Nombre de sommets dans le graphe
-
-// Fonction utilitaire pour trouver le sommet avec la distance minimale
-// parmi les sommets non encore inclus dans le plus court chemin calculé
-int trouverMinimumDistance(int distance[], int inclusDansPlusCourtChemin[]) {
-    int min = INT_MAX, min_index;
-
-for (int v = 0; v < V; v++) {
-        if (!inclusDansPlusCourtChemin[v] && distance[v] <= min) {
-            min = distance[v];
-            min_index = v;
-        }
-    }
-
-    t_sommet** sommet;
-    t_arc* arc;
-    int choix =0;
-
-
-    / Fonction utilitaire pour afficher le tableau des distances calculées
-void afficherSolution(int distance[]) {
-    printf("Sommet \t Distance depuis le sommet source\n");
-    for (int i = 0; i < V; i++)
-        printf("%d \t %d\n", i, distance[i]);
-}
-
-// Fonction principale implémentant l'algorithme de Dijkstra pour un graphe donné
-void dijkstra(int graphe[V][V], int src) {
-    int distance[V];  // Tableau pour stocker les distances les plus courtes du sommet source à chaque sommet
-    int inclusDansPlusCourtChemin[V];  // Tableau pour indiquer si le sommet est inclus dans le plus court chemin
-
-    return min_index;
-}
-
 
 
