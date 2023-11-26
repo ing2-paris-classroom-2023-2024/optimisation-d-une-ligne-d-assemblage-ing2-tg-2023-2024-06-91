@@ -64,3 +64,20 @@ typedef struct sommet_temp
 }t_sommet_temp;
 
 #endif //OPTIMISATION_D_UNE_LIGNE_D_ASSEMBLAGE_ING2_TG_2023_2024_06_91_HEADER_H
+
+
+typedef struct arrete_temp
+{
+    int depart;
+    int arrivee;
+    int poids;
+}t_arrete_temp;
+
+typedef struct sommet_temp
+{
+    int num_sommet;
+    int comp_connex;
+}t_sommet_temp;
+
+#endif //OPTIMISATION_D_UNE_LIGNE_D_ASSEMBLAGE_ING2_TG_2023_2024_06_91_HEADER_H
+
