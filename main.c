@@ -322,5 +322,29 @@ void Kruskal(t_graphe*  graphe)
     printf("\n\npoids total :  %d\n\n",Poids_total);
 }
 
+//Affichage 1
+            t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex=t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex;
+            printf("\nSommet de Depart  %d ---> Sommet d'Arrivee  %d ",t_sommet_temp[Tablo_arretes[nbarete].depart].num_sommet,t_sommet_temp[Tablo_arretes[nbarete].arrivee].num_sommet);
+            Poids_total+=Tablo_arretes[nbarete].poids;
+            numencours++;
+        }
+        nbarete++;
+    }
+//Affichage 2
+    printf("\n\n");
+
+    for(int j=0;j<graphe->ordre;j++)
+    {
+        printf("\n\tSommet : %d = composante connexe %d",t_sommet_temp[j].num_sommet,t_sommet_temp[j].comp_connex);
+    }
+
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+}
+
 
 
