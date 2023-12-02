@@ -1,10 +1,7 @@
 /***********************************************BORAZ BOUCHANE VALLETTE SETTBON**************************************************************************/
 /********************************PROJET théorie des graphes : optimisation d'une ligne d'assemblage groupe 91******************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <windows.h>
-#include <sys/time.h>
+
 #include "header.h"
 
 // Size of array take all the array, so it's twice as big if each cell got 2 integer in it;

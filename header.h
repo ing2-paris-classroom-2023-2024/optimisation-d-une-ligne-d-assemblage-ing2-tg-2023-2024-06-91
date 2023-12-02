@@ -4,6 +4,11 @@
 #ifndef OPTIMISATION_D_UNE_LIGNE_D_ASSEMBLAGE_ING2_TG_2023_2024_06_91_HEADER_H
 #define OPTIMISATION_D_UNE_LIGNE_D_ASSEMBLAGE_ING2_TG_2023_2024_06_91_HEADER_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <sys/time.h>
+
 typedef struct Node_Workshop_Pointer
 {
     struct node* nodes;
