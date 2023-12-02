@@ -623,7 +623,213 @@ int IsWorkShopExcluded(int actualWorkshop,const int* Tab, int sizeofTab)
     return 1;
 }
 
+int* GetNodePriority(t_WorkShop workshop)
+{
+    int* Tab = NULL;
+    for (int i = 0; i < workshop.SizeOfNamesArray; ++i) {
+        Tab = (int*)realloc(Tab,(i+1)*sizeof(int));
+        Tab[i] = workshop.nodesNames[i];
+        sortarray(Tab,(i+1));
+    }
+    return Tab;
+}
 
+void sortarray(int* Tab,int SizeOfTab)
+{
+    for (int i = SizeOfTab-1; i > 0; i--) {
+        if(Tab[i] > Tab[i-1])
+        {
+            int buffer = Tab[i];
+            Tab[i] = Tab[i-1];
+            Tab[i-1] = buffer;
+        }
+    }
+}
+
+int FindHeaviestWorkShop(t_WorkShop* Workshops,int SizeOfWorkShops)
+{
+    float PrevTime = 0;
+    int WS = 0;
+    for (int i = 0; i < SizeOfWorkShops; ++i) {
+        if(Workshops[i].TotalTimeCycle > PrevTime && Workshops[i].SizeOfNamesArray != 1)
+        {
+            PrevTime = Workshops[i].TotalTimeCycle;
+            WS = i;
+        }
+    }
+    return WS;
+}
+
+void UpdateAllincompatibility(t_node* nodes,t_WorkShop* Workshop)
+{
+    Workshop->SizeOfNodeIncompatibilityArray = 0;
+    free(Workshop->nodesincompatibility);
+    Workshop->nodesincompatibility = NULL;
+    for (int i = 0; i < Workshop->SizeOfNamesArray; ++i) {
+        UpdateWorkshopincompatibility(nodes,Workshop->nodesNames[i],Workshop);
+    }
+}
+
+void UpdateWorkshopincompatibility(t_node* nodes,int node,t_WorkShop* Workshop)
+{
+    int flagAlreadyExiste;
+    for(int i = 0 ; i < nodes[node].Size_Of_Incompatibility_Array ; i++)
+    {
+        flagAlreadyExiste = 0;
+        for(int j = 0 ; j < Workshop->SizeOfNodeIncompatibilityArray ; j++)
+        {
+            if(nodes[node].inconmpatibility[i] == Workshop->nodesincompatibility[j])
+            {
+                flagAlreadyExiste = 1;
+            }
+        }
+        if (flagAlreadyExiste == 0)
+        {
+            Workshop->SizeOfNodeIncompatibilityArray++;
+            Workshop->nodesincompatibility = (int*) realloc(Workshop->nodesincompatibility,sizeof(int)*Workshop->SizeOfNodeIncompatibilityArray);
+            Workshop->nodesincompatibility[Workshop->SizeOfNodeIncompatibilityArray-1] = nodes[node].inconmpatibility[i];
+        }
+    }
+}
+
+t_WorkShop* WorkshopInnit(t_WorkShop* workshop,int size)
+{
+    //printf("Size : %d\n",size);
+    workshop = (t_WorkShop*)realloc(workshop,sizeof(t_WorkShop)*size);
+    workshop[size-1].TotalTimeCycle = 0;
+    workshop[size-1].identifier = size;
+    workshop[size-1].nodesNames = NULL;
+    workshop[size-1].nodesincompatibility = NULL;
+    workshop[size-1].SizeOfNamesArray = 0;
+    workshop[size-1].SizeOfNodeIncompatibilityArray = 0;
+    return workshop;
+}
+
+int PlaceNodeInWorkshop(t_WorkShop* WorkShops,int SizeOfTheWorkshop,int node)
+{
+    for(int i = 0; i < SizeOfTheWorkshop ; i++) {
+        if(CanNodeBeInWorkshop(WorkShops[i],node))
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int CanNodeBeInWorkshop(t_WorkShop Workshop,int node)
+{
+    for (int i = 0; i < Workshop.SizeOfNodeIncompatibilityArray; ++i) {
+        if(Workshop.nodesincompatibility[i] == node)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+long long current_time_in_ms() {
+    struct timeval te;
+    gettimeofday(&te, NULL);
+
+    long long milliseconds = te.tv_sec * 1000LL + te.tv_usec / 1000; // Calculate milliseconds
+    return milliseconds;
+}
+
+void simulation(t_WorkShop* Workshop,int SizeOfWorkshop,t_node* nodes,int SizeOfOperatioon)
+{
+    printf("Launching Simulation ...\n\n");
+    for (int i = 0; i < SizeOfWorkshop; ++i) {
+        Workshop[i].TotalTimeCycle = 0;
+    }
+    int* WorkShopOccupation = (int*)calloc(SizeOfWorkshop,sizeof(int)); /// State of occupation of the array, 1 = occupied 0 =  not occupied
+    int* OperationDone = (int*)calloc(SizeOfOperatioon,sizeof(int)); /// State of operation 0 = not done, 1 = done
+    long long TimeStart = current_time_in_ms(); /// get time for final calculation ;
+    while(IsWorkshopNotEmpty(Workshop,SizeOfWorkshop))
+    {
+        for (int i = 0; i < SizeOfWorkshop; ++i) {
+            if(Workshop[i].TotalTimeCycle == 0) /// not finished to do simulation
+            {
+                if(WorkShopOccupation[i] == 0) /// if workshop isn't done,
+                {
+                    Workshop[i].CurrentOperation = FindOperationNotDone(Workshop[i],OperationDone,nodes);
+                    if(Workshop[i].CurrentOperation != -1)
+                    {
+                        Workshop[i].OperationTimer = current_time_in_ms()+(long long)(nodes[Workshop[i].CurrentOperation].operationTime*1000);
+                        /// printf("%d %d %lld %lld\n",i,Workshop[i].CurrentOperation+1,Workshop[i].OperationTimer,current_time_in_ms()); /// DEBUG TiMING;
+                        WorkShopOccupation[i] = 1;
+                    }
+                }
+                else
+                {
+                    if(Workshop[i].OperationTimer <= current_time_in_ms())
+                    {
+                        OperationDone[Workshop[i].CurrentOperation] = 1;
+                        WorkShopOccupation[i] = 0;
+                        if(IsWorkShopDoneOperating(Workshop[i],OperationDone))
+                        {
+                            Workshop[i].TotalTimeCycle = (float)(current_time_in_ms()-TimeStart)/1000;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    system("cls");
+    goToXY(0,0);
+    for (int i = 0; i < SizeOfWorkshop; ++i) {
+        printf("TIME CYCLE WORKSHOP %d : %f \n",i,Workshop[i].TotalTimeCycle);
+    }
+    printf("\n\n");
+    free(OperationDone);
+    free(WorkShopOccupation);
+}
+
+int FindOperationNotDone(t_WorkShop Workshop,const int* OperationArray,t_node* nodes)
+{
+    for (int i = 0; i < Workshop.SizeOfNamesArray; ++i) {
+        if(OperationArray[Workshop.nodesNames[i]] == 0)
+        {
+            if(canNodeBeProcessedWithPrecedence(OperationArray,nodes,Workshop.nodesNames[i]))
+            {
+                return Workshop.nodesNames[i];
+            }
+        }
+    }
+    return -1;
+}
+
+int canNodeBeProcessedWithPrecedence(const int* OperationArray,t_node* nodes,int node)
+{
+    for (int i = 0; i < nodes[node].Size_Of_Previous_Array; ++i) {
+        if(OperationArray[nodes[node].prevnode[i]] == 0)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int IsWorkShopDoneOperating(t_WorkShop Workshop,const int* OperationArray)
+{
+    for (int i = 0; i < Workshop.SizeOfNamesArray; ++i) {
+        if(OperationArray[Workshop.nodesNames[i]] == 0)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+//init workshop//
+int IsWorkshopNotEmpty(t_WorkShop* Workshop,int SizeOfWorkshop){
+    for(int i = 0 ; i < SizeOfWorkshop ; i ++)
+    {
+        if(Workshop[i].TotalTimeCycle == 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 
 
