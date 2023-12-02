@@ -28,6 +28,8 @@ int** readfileexclusionsandlink(char FileName[],int* SizeOfExclusion){
     return Tab;
 }
 
+/// sous programme
+
 t_node* readfileOperationFile(char FileName[], int* SizeOfOperation){
     t_node* nodes = NULL;
     int size = 0;
