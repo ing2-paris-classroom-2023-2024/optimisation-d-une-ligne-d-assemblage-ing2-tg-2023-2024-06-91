@@ -2,837 +2,349 @@
 /********************************PROJET théorie des graphes : optimisation d'une ligne d'assemblage groupe 91******************************************************/
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <windows.h>
-#include <sys/time.h>
-#include "ProjectHeader.h"
+#include "header.h"
 
-// Size of array take all the array, so it's twice as big if each cell got 2 integer in it;
 
-int main() {
-    int FlagQuit = 0;
-    int FirstTime = 1;
-    char Buffer;
-    t_pointers Organisation;
-    Organisation.SizeWorkShopsArray = 0;
-    Organisation.SizeNodeArray = 0;
-    while(!FlagQuit)
-    {
-        int input;
-        printf("What Action Would you performe \n1 : Launch \n2 : ShowWorkshop \n3 : ShowNodes \n4 : ShowPrecedence\n5 : Quit\n");
-        fflush(stdin);
-        scanf("%d",&input);
-        switch (input) {
-            case 1:
-                goToXY(0,0);
-                system("cls");
-                if(!FirstTime)
-                {
-                    freeNode(Organisation.nodes,Organisation.SizeNodeArray);
-                    freeWorkShop(Organisation.WorkShops,Organisation.SizeWorkShopsArray);
-                }
-                FirstTime = 0;
-                LaunchWorkshopOrganizer(&Organisation);
-                break;
-            case 2:
-                if(Organisation.SizeWorkShopsArray != 0)
-                {
-                    goToXY(0,0);
-                    system("cls");
-                    ReadWorkshop(Organisation.WorkShops,Organisation.SizeWorkShopsArray,Organisation.nodes);
-                    printf("press enter to quit");
-                    fflush(stdin);
-                    scanf("%c",&Buffer);
-                }
-                else
-                {
-                    goToXY(0,0);
-                    system("cls");
-                    printf("WorkShop Not organized Yet ! please launch 1 First !");
-                    Sleep(1000);
-                }
 
-                break;
-            case 3:
-                if(Organisation.SizeWorkShopsArray != 0)
-                {
-                    goToXY(0,0);
-                    system("cls");
-                    printf("Show nodes\n");
-                    ReadNodes(Organisation.nodes,Organisation.SizeNodeArray);
-                    printf("press enter to quit");
-                    fflush(stdin);
-                    scanf("%c",&Buffer);
-                }
-                else
-                {
-                    goToXY(0,0);
-                    system("cls");
-                    printf("WorkShop Not organized Yet ! please launch 1 First !");
-                    Sleep(1000);
-                }
-                break;
-            case 4:
-                if(Organisation.SizeWorkShopsArray != 0)
-                {
-                    int flagStop = 0;
-                    while(!flagStop)
-                    {
-                        goToXY(0,0);
-                        system("cls");
-                        int node;
-                        printf("please input the node needed, type -999 to quit\n");
-                        printf("Input Available : ");
-                        for (int i = 0; i < Organisation.SizeNodeArray; ++i) {
-                            printf("%d ",Organisation.nodes[i].IdNumber);
-                        }
-                        printf("\n");
-                        fflush(stdin);
-                        scanf("%d",&node);
-                        if(node == -999)
-                        {
-                            break;
-                        }
-                        int pointer = FindIndexOfIdName(node,Organisation.nodes,Organisation.SizeNodeArray);
-                        if(pointer == -1)
-                        {
-                            printf("Node doesn't existe please try again");
-                            Sleep(1000);
-                        }
-                        else
-                        {
-                            system("cls");
-                            goToXY(0,1);
-                            int Iteration = 0;
-                            printf("%d",node);
-                            while(Organisation.nodes[pointer].Size_Of_Previous_Array !=0)
-                            {
-                                for (int i = 0; i < Organisation.nodes[pointer].Size_Of_Previous_Array; ++i) {
-                                    if(i == 0)
-                                    {
-                                        goToXY(Iteration*6+3,i+1);
-                                        printf("-->%d",Organisation.nodes[Organisation.nodes[pointer].prevnode[i]].IdNumber);
-                                    }
-                                    else
-                                    {
-                                        goToXY(Iteration*6+3,i+1);
-                                        printf("\\->%d",Organisation.nodes[Organisation.nodes[pointer].prevnode[i]].IdNumber);
-                                    }
-                                }
-                                Iteration++;
-                                pointer = Organisation.nodes[pointer].prevnode[0];
-                            }
-                            printf("\n\n\npress enter to Continue");
-                            fflush(stdin);
-                            scanf("%c",&Buffer);
-                        }
-                    }
-                }
-                else
-                {
-                    goToXY(0,0);
-                    system("cls");
-                    printf("WorkShop Not organized Yet ! please launch 1 First !");
-                    Sleep(1000);
-                }
-                break;
-            case 5:
-                printf("See you next time\n");
-                FlagQuit = !FlagQuit;
-                /// FREE MEMORY
-                /// need better Free methode
-                freeNode(Organisation.nodes,Organisation.SizeNodeArray);
-                freeWorkShop(Organisation.WorkShops,Organisation.SizeWorkShopsArray);
-                break;
-            default:
-                printf("input incorrect, please try again\n");
-                break;
-        }
-        goToXY(0,0);
-        system("cls");
-    }
+int main(){
+    printf("debut du projet\n");
+    printf("commencement de la theorie des graphes\n");
+    printf("premier commit de toute ma vie\n");
+
 }
 
-void LaunchWorkshopOrganizer(t_pointers* Organisation)
+
+/// Fonction pour afficher les successeurs d'un sommet donné dans le graphe.
+void successeur(t_sommet** sommet, int num)
 {
-    int VerifTiming = 1;
-    int LastNodeSwap = -1;
-    int SizeOfWorkshopTried = 1;
-    int* ListeOfWorkshopTried = NULL;
-    int lastWorkshop;
-    ListeOfWorkshopTried = (int*)realloc(ListeOfWorkshopTried,sizeof(int)*SizeOfWorkshopTried);
-    ListeOfWorkshopTried[0] = -1;
+    // Accéder à la liste d'arêtes du sommet.
+    printf(" sommet %d :\n",num);
 
-    Organisation->nodes = readfileOperationFile("operations.txt",&Organisation->SizeNodeArray);
-    InstallExclusionToStructur(Organisation->nodes,Organisation->SizeNodeArray);
-    InstallPrecedenceToStructur(Organisation->nodes,Organisation->SizeNodeArray);
-    Organisation->WorkShops = SetupWorkshop(Organisation->nodes,Organisation->SizeNodeArray,&Organisation->SizeWorkShopsArray);
-    /// ReadNodes(nodes,SizeOfNodesArray);
-    while(VerifTiming)
+    t_arc* arc=sommet[num]->arc;
+
+    while(arc!=NULL)
     {
-        simulation(Organisation->WorkShops,Organisation->SizeWorkShopsArray,Organisation->nodes,Organisation->SizeNodeArray);
-        Organisation->WorkShops = Verify_or_reorganise_WorkShops(Organisation->WorkShops,&Organisation->SizeWorkShopsArray,&VerifTiming,&LastNodeSwap,ListeOfWorkshopTried,&SizeOfWorkshopTried,Organisation->nodes,&lastWorkshop);
-        printf("Last Swap : %d\nLast Workshop : %d\n\n",Organisation->nodes[LastNodeSwap].IdNumber,lastWorkshop);
-        //ReadWorkshop(Organisation->WorkShops,Organisation->SizeWorkShopsArray,Organisation->nodes);
-        verifWorkshop(Organisation->WorkShops,Organisation->SizeWorkShopsArray,Organisation->SizeNodeArray);
+        printf("\t successeur: %d | poids : %d  \n",arc->sommet,arc->poids);
+        arc=arc->arc_suivant;
     }
-    system("cls");
-    goToXY(0,0);
-    printf("DONE !");
-    Sleep(1000);
+
 }
 
-void verifWorkshop(t_WorkShop* Workshop,int SizeofWorkshop,int SizeOfNod)
+// Fonction pour créer une arête entre deux sommets du graphe avec un poids donné.
+t_sommet** Creer_a(t_sommet** sommet,int s1,int s2, int poids)
 {
-    int tab[SizeOfNod];
-    for (int i = 0; i < SizeOfNod; ++i) {
-        tab[i] = 0;
-    }
-    for (int i = 0; i < SizeofWorkshop; ++i) {
-        for (int j = 0; j < Workshop[i].SizeOfNamesArray; ++j) {
-            if(tab[Workshop[i].nodesNames[j]] == 0)
-            {
-                tab[Workshop[i].nodesNames[j]] = 1;
-            }
-            else
-            {
-                printf("An Error has occurred, Node in 2 Different Workshop\n");
-                exit(-999);
-            }
-        }
-    }
-}
-
-void freeNode(t_node* Nodes, int SizeofNodes)
-{
-    for (int i = 0; i < SizeofNodes; ++i) {
-        free(Nodes[i].inconmpatibility);
-        free(Nodes[i].prevnode);
-    }
-    free(Nodes);
-}
-
-void freeWorkShop(t_WorkShop* WorkShop, int SizeofWorkShop)
-{
-    for (int i = 0; i < SizeofWorkShop; ++i) {
-        free(WorkShop[i].nodesNames);
-        free(WorkShop[i].nodesincompatibility);
-    }
-    free(WorkShop);
-}
-
-void goToXY( int col, int lig)
-{
-    COORD mycoord;
-    mycoord.X = (signed short)col;
-    mycoord.Y = (signed short)lig;
-    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), mycoord );
-}
-
-void Free_Double_Array(int** Tab,int size){
-    for(int i = 0 ; i < size; i++)
+    if(sommet[s1]->arc==NULL)
     {
-        free(Tab[i]);
-    }
-    free(Tab);
-    //printf("FreeArray Successfully\n");
-}
-/*
-void ReadArray(int** Tab,int size){
-    for(int i = 0 ; i < size; i++)
-    {
-        printf("%d %d\n",Tab[i][0],Tab[i][1]);
-    }
-}
-*/
-void ReadNodes(t_node* nodes,int size){
-    for(int i = 0 ; i < size; i++)
-    {
-        printf("Node %d \n",nodes[i].IdNumber);
-        printf("Operation Time : %f\n", nodes[i].operationTime);
-        printf("Incompatibility : %d\n",nodes[i].Size_Of_Incompatibility_Array);
-        for(int j = 0 ; j < nodes[i].Size_Of_Incompatibility_Array ; j ++)
-        {
-            printf("%d ",nodes[nodes[i].inconmpatibility[j]].IdNumber);
-        }
-        printf("\nPrevious node : %d\n",nodes[i].Size_Of_Previous_Array);
-        for(int j = 0 ; j < nodes[i].Size_Of_Previous_Array ; j ++)
-        {
-            printf("%d ",nodes[nodes[i].prevnode[j]].IdNumber);
-        }
-        printf("\n\n");
-    }
-}
-
-void ReadWorkshop(t_WorkShop* WorkShops,int size,t_node* nodes){
-    for(int i = 0 ; i < size; i++)
-    {
-        printf("WorkShop %d \n",WorkShops[i].identifier);
-        printf("Number of incompatible node : %d\n",WorkShops[i].SizeOfNodeIncompatibilityArray);
-        for (int j = 0; j < WorkShops[i].SizeOfNodeIncompatibilityArray; ++j) {
-            printf("%d ",nodes[WorkShops[i].nodesincompatibility[j]].IdNumber);
-        }
-        printf("\n");
-        printf("Number of node : %d\n",WorkShops[i].SizeOfNamesArray );
-        for (int j = 0; j < WorkShops[i].SizeOfNamesArray; ++j) {
-            printf("%d ",nodes[WorkShops[i].nodesNames[j]].IdNumber);
-        }
-        printf("\n");
-        /// Total cycle time
-        printf("\n");
-    }
-}
-
-int FindIndexOfIdName(int Name,t_node* nodes,int SizeOfArray)
-{
-    for(int i = 0 ; i < SizeOfArray;i++)
-    {
-        if(Name == nodes[i].IdNumber)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-void InstallExclusionToStructur(t_node* nodes,int SizeOfNode){
-    int SizeOfExclusion;
-    int** exclusionArray = readfileexclusionsandlink("exclusion.txt",&SizeOfExclusion);
-    ///innit nodesArray (no particular reason just so that it's done)
-    for(int i = 0 ; i < SizeOfNode ; i++)
-    {
-        nodes[i].Size_Of_Incompatibility_Array = 0;
-        nodes[i].inconmpatibility = NULL;
-        nodes[i].prevnode = NULL;
-        nodes[i].workshopAssigned = -1;
-        nodes[i].Size_Of_Previous_Array = 0;
-    }
-    for(int i = 0 ; i < SizeOfExclusion ; i++)
-    {
-        int NodeA = FindIndexOfIdName(exclusionArray[i][0],nodes,SizeOfNode);
-        int NodeB = FindIndexOfIdName(exclusionArray[i][1],nodes,SizeOfNode);
-        if(NodeA == -1 || NodeB == -1){ printf("Exception: an operation didn't existe in the file Operation.txt");exit(-2);}
-        nodes[NodeA].Size_Of_Incompatibility_Array++;
-        nodes[NodeB].Size_Of_Incompatibility_Array++;
-        nodes[NodeA].inconmpatibility = (int*) realloc(nodes[NodeA].inconmpatibility,sizeof(int)*nodes[NodeA].Size_Of_Incompatibility_Array);
-        nodes[NodeB].inconmpatibility = (int*) realloc(nodes[NodeB].inconmpatibility,sizeof(int)*nodes[NodeB].Size_Of_Incompatibility_Array);
-        nodes[NodeA].inconmpatibility[nodes[NodeA].Size_Of_Incompatibility_Array-1]=NodeB;
-        nodes[NodeB].inconmpatibility[nodes[NodeB].Size_Of_Incompatibility_Array-1]=NodeA;
-    }
-    Free_Double_Array(exclusionArray,SizeOfExclusion);
-}
-
-void InstallPrecedenceToStructur(t_node* nodes,int SizeOfNode){
-    int SizeOfPrecedence;
-    int** PrecedenceArray = readfileexclusionsandlink("precedences.txt",&SizeOfPrecedence);
-    for(int i = 0 ; i < SizeOfPrecedence ; i++)
-    {
-        int NodeA = FindIndexOfIdName(PrecedenceArray[i][0],nodes,SizeOfNode);
-        int NodeB = FindIndexOfIdName(PrecedenceArray[i][1],nodes,SizeOfNode);
-        if(NodeA == -1 || NodeB == -1){ printf("Exception: an operation didn't existe in the file Operation.txt");exit(-2);}
-        nodes[NodeB].Size_Of_Previous_Array++;
-        nodes[NodeB].prevnode = (int*) realloc(nodes[NodeB].prevnode,sizeof(int)*nodes[NodeB].Size_Of_Previous_Array);
-        nodes[NodeB].prevnode[nodes[NodeB].Size_Of_Previous_Array-1]=NodeA;
-    }
-    Free_Double_Array(PrecedenceArray,SizeOfPrecedence);
-}
-
-t_WorkShop* SetupWorkshop(t_node* nodes,int SizeOfNode,int* SizeWorkshop)
-{
-    int SizeOfWorkshop = 1;
-    t_WorkShop* Workshop = NULL;
-    Workshop = WorkshopInnit(Workshop,SizeOfWorkshop);
-
-    int* Task = (int*)calloc(SizeOfNode,sizeof(int));
-    for(int i = 0 ; i < SizeOfNode;i++)
-    {
-        int Placement = PlaceNodeInWorkshop(Workshop,SizeOfWorkshop,i);
-        /// CASE WHERE NODE CAN BE PLACED IN 1 WORKSHOP
-        if(Placement!=-1)
-        {
-            Workshop[Placement].SizeOfNamesArray++;
-            Workshop[Placement].nodesNames = (int*)realloc(Workshop[Placement].nodesNames,sizeof(int)*Workshop[Placement].SizeOfNamesArray);
-            Workshop[Placement].nodesNames[Workshop[Placement].SizeOfNamesArray-1] = i;
-            UpdateWorkshopincompatibility(nodes,i,&Workshop[Placement]);
-        }
-            /// CASE WHERE NODE CAN'T BE PLACED IN 1 WORKSHOP AND NEED TO CREATE A NEW ONE
-        else
-        {
-            SizeOfWorkshop++;
-            Workshop = WorkshopInnit(Workshop,SizeOfWorkshop);
-            Workshop[SizeOfWorkshop-1].SizeOfNamesArray++;
-            Workshop[SizeOfWorkshop-1].nodesNames = (int*)realloc(Workshop[SizeOfWorkshop-1].nodesNames,sizeof(int)*Workshop[SizeOfWorkshop-1].SizeOfNamesArray);
-            Workshop[SizeOfWorkshop-1].nodesNames[Workshop[SizeOfWorkshop-1].SizeOfNamesArray-1] = i;
-            UpdateWorkshopincompatibility(nodes,i,&Workshop[SizeOfWorkshop-1]);
-        }
-    }
-    free(Task);
-    *SizeWorkshop = SizeOfWorkshop;
-    return Workshop;
-}
-
-float CalculMinimumTimeCycleforOperation(t_node* nodes, int pointer)
-{
-    float Time = (float)INT_MAX;
-    for (int i = 0; i < nodes[pointer].Size_Of_Previous_Array; ++i) {
-        float nextTIme =  CalculMinimumTimeCycleforOperation(nodes,nodes[pointer].prevnode[i]);
-        if(nextTIme < Time)
-        {
-            Time = nextTIme;
-        }
-    }
-    if(nodes[pointer].Size_Of_Previous_Array == 0)
-    {
-        return nodes[pointer].operationTime;
+        t_arc* n_arc=(t_arc*)malloc(sizeof(t_arc));
+        n_arc->sommet=s2;
+        n_arc->poids=poids;
+        n_arc->arc_suivant=NULL;
+        sommet[s1]->arc=n_arc;
+        return sommet;
     }
     else
     {
-        return nodes[pointer].operationTime + Time;
+        t_arc* temp=sommet[s1]->arc;
+        while( !(temp->arc_suivant==NULL))
+        {
+            temp=temp->arc_suivant;
+        }
+        t_arc* n_arc=(t_arc*)malloc(sizeof(t_arc));
+        n_arc->sommet=s2;
+        n_arc->poids=poids;
+        n_arc->arc_suivant=NULL;
+
+        temp->arc_suivant=n_arc;
+        return sommet;
     }
 }
 
-int IsWorkshopWithSingleNodePossible(t_WorkShop* Workshops,int SizeOfWorkshops,t_node* nodes,float MaxcycleTime)
+// Créer un nouveau graphe avec un certain nombre de sommets (ordre).
+t_graphe* creation_graphe(int ordre)
 {
-    int flagExistWorkshop = 0;
-    for (int i = 0; i < SizeOfWorkshops; i++) {
-        if(Workshops[i].SizeOfNamesArray != 1)
+    t_graphe * n_graphe=(t_graphe*)malloc(sizeof(t_graphe));
+    n_graphe->pSommet = (t_sommet**)malloc(ordre*sizeof(t_sommet*));
+
+    for(int i=0; i<ordre; i++)
+    {
+        n_graphe->pSommet[i]=(t_sommet*)malloc(sizeof(t_sommet));
+        n_graphe->pSommet[i]->valeur=i;
+        n_graphe->pSommet[i]->marque=0;
+        n_graphe->pSommet[i]->degre=0;
+        n_graphe->pSommet[i]->pre=-1;
+        n_graphe->pSommet[i]->arc=NULL;
+    }
+    return n_graphe;
+}
+
+// Extraire un graphe à partir d'un fichier texte.
+t_graphe* extraire_graphe()
+{
+    t_graphe* graphe;
+    FILE * ifs = fopen("grapheTP5.txt","r");
+    int taille, ordre, s1, s2, poids;
+
+    if (!ifs)
+    {
+        printf("Erreur de lecture fichier\n");
+        exit(-1);
+    }
+
+    fscanf(ifs,"%d",&ordre);
+    fscanf(ifs,"%d",&taille);
+    graphe=creation_graphe(ordre);
+
+
+    graphe->ordre=ordre;
+    graphe->taille=taille;
+
+    for (int i=0; i<taille; ++i)
+    {
+        fscanf(ifs,"   %d %d %d",&s1,&s2,&poids);
+        graphe->pSommet=Creer_a(graphe->pSommet, s1, s2,poids);
+
+
+        graphe->pSommet=Creer_a(graphe->pSommet, s2, s1, poids);
+    }
+
+    return graphe;
+}
+
+// Afficher le graphe avec les successeurs de chaque sommet.
+void affiche_g(t_graphe* graphe)
+{
+    printf("graphe\n");
+
+
+    printf("ordre = %d\n",graphe->ordre);
+
+    printf("listes d'adjacence :\n");
+
+    for (int i=0; i<graphe->ordre; i++)
+    {
+        successeur(graphe->pSommet, i);
+        printf("\n");
+    }
+// Fonction permettant de trier et de ranger dans l'ordre croissant les poids des différentes arêtes.
+void tri_poids(t_graphe * graphe,t_arrete_temp Tablo_arretes[])
+{
+    t_arrete_temp tmp;// Création d'une variable temporaire de type t_arrete_temp
+    int index;
+
+    for (int i=0; i < (graphe->taille-1); i++)
+    {
+        index = i;
+
+        for (int j=i + 1; j < graphe->taille; j++)
         {
-            flagExistWorkshop = 1;
+            if (Tablo_arretes[index].poids > Tablo_arretes[j].poids)
+                index = j;
+        }
+
+        if (index != i)
+        {
+            tmp = Tablo_arretes[i];
+            Tablo_arretes[i] = Tablo_arretes[index];
+            Tablo_arretes[index] = tmp;
+        }
+    }
+}
+
+int lire_pds(t_graphe* graphe, int num,int listearrete[],t_arrete_temp Tablo_arretes[],int num_arretes)
+{
+    int res=0,j=0,temp=0;// Initialisation des variables
+    t_arc* arcc=graphe->pSommet[num]->arc;
+    while(arcc!=NULL)
+    {
+        res=0;
+        j=0;
+        if(graphe->pSommet[num]->valeur>arcc->sommet)//different cas possible
+        {
+            temp=arcc-> sommet+ (10*graphe->pSommet[num]->valeur);
         }
         else
         {
-            int pointeur = Workshops[i].nodesNames[0];
-            float MinimumTimeCycle = CalculMinimumTimeCycleforOperation(nodes,pointeur);
-            //printf("\nNODE : %d , TIMEFOUND : %f TIME MAX : %f\n",pointeur,MinimumTimeCycle,MaxcycleTime);
-            if(MinimumTimeCycle > MaxcycleTime+0.00001)
-            {
-                return 1;
-            }
+            temp=graphe->pSommet[num]->valeur + (10*arcc->sommet);
         }
-    }
-    if(flagExistWorkshop)
-    {
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
-}
 
-t_WorkShop* Verify_or_reorganise_WorkShops(t_WorkShop* WorkShop,int* SizeOfWorkshops,int* flag,int* LastNodeSwap,int* ListOfWorkShopTried,int* SizeOfWorkshopTried,t_node* nodes,int* lastWorkshop)
-{
-    float maxTiming = readfileTimeCycle("temps_cycle.txt");
-    *flag = 0;
-    for (int i = 0; i < *SizeOfWorkshops; ++i) {
-        if(WorkShop[i].TotalTimeCycle > maxTiming)
+        for(int i=0;i<graphe->taille;i++)
         {
-            *flag = 1;
-            /* // THIS CODE ALLOW THE ENDING WHEN ONE ARRAY CONTAIN 1 Task and still exceed the time limit
-            if(WorkShop[i].SizeOfNamesArray == 1)
+            if(listearrete[i]==temp)
             {
-                printf("Can't Find Optimization for this TimeCycle");
-                exit(4);
-            }
-            */
-            if(IsWorkshopWithSingleNodePossible(WorkShop,*SizeOfWorkshops,nodes,maxTiming))
-            {
-                printf("Can't Find Optimization for this TimeCycle");
-                exit(4);
-            }
-        }
-    }
-    if(*flag == 1)
-    {
-        int Lastpile0;
-        int flagPile0equaltolast = 0;
-        int heaviestWorkShops = FindHeaviestWorkShop(WorkShop,*SizeOfWorkshops);
-        int* pile= GetNodePriority(WorkShop[heaviestWorkShops]);
-        if(nodes[pile[0]].operationTime == nodes[*LastNodeSwap].operationTime)
-        {
-            Lastpile0 = pile[0];
-            flagPile0equaltolast = 1;
-            pile[0] = *LastNodeSwap;
-        }
-        for (int i = 0; i < WorkShop[heaviestWorkShops].SizeOfNamesArray; ++i) {
-            if(pile[i] == *LastNodeSwap)
-            {
-                int WorkShopToSwap = canNodeBeInWorkshop(WorkShop,*SizeOfWorkshops,ListOfWorkShopTried,*SizeOfWorkshopTried,pile[i],nodes,maxTiming);
-                if(WorkShopToSwap != -1)
-                {
-                    *SizeOfWorkshopTried +=1;
-                    (int*)realloc(ListOfWorkShopTried,sizeof(int)*(*SizeOfWorkshopTried));
-                    ListOfWorkShopTried[*SizeOfWorkshopTried-1] = WorkShopToSwap;
-                    if(flagPile0equaltolast && i == 0)
-                    {
-                        WorkShop[*lastWorkshop] = deletNodeFromWorkshop(WorkShop[*lastWorkshop],Lastpile0);
-                        //printf("TEST2, %d, %d\n",WorkShop[0].identifier,flagPile0equaltolast);
-                        WorkShop[*lastWorkshop] = OrganisedArrayWorkshopName(WorkShop[*lastWorkshop]);
-                        WorkShop[*lastWorkshop].SizeOfNamesArray--;
-                        WorkShop[WorkShopToSwap].SizeOfNamesArray++;
-                        WorkShop[WorkShopToSwap].nodesNames = (int*)realloc(WorkShop[WorkShopToSwap].nodesNames,sizeof(int)*WorkShop[WorkShopToSwap].SizeOfNamesArray);
-                        WorkShop[WorkShopToSwap].nodesNames[WorkShop[WorkShopToSwap].SizeOfNamesArray-1] = pile[i];
-                        *LastNodeSwap = pile[i];
-                        UpdateAllincompatibility(nodes,&WorkShop[*lastWorkshop]);
-                        UpdateWorkshopincompatibility(nodes,pile[i],&WorkShop[WorkShopToSwap]);
-                        free(pile);
-                        return WorkShop;
-                    }
-                    else
-                    {
-                        WorkShop[heaviestWorkShops] = deletNodeFromWorkshop(WorkShop[heaviestWorkShops],pile[i]);
-                        //printf("TEST2, %d, %d\n",WorkShop[0].identifier,flagPile0equaltolast);
-                        WorkShop[heaviestWorkShops] = OrganisedArrayWorkshopName(WorkShop[heaviestWorkShops]);
-                        WorkShop[heaviestWorkShops].SizeOfNamesArray--;
-                        WorkShop[WorkShopToSwap].SizeOfNamesArray++;
-                        WorkShop[WorkShopToSwap].nodesNames = (int*)realloc(WorkShop[WorkShopToSwap].nodesNames,sizeof(int)*WorkShop[WorkShopToSwap].SizeOfNamesArray);
-                        WorkShop[WorkShopToSwap].nodesNames[WorkShop[WorkShopToSwap].SizeOfNamesArray-1] = pile[i];
-                        *LastNodeSwap = pile[i];
-                        UpdateAllincompatibility(nodes,&WorkShop[heaviestWorkShops]);
-                        UpdateWorkshopincompatibility(nodes,pile[i],&WorkShop[WorkShopToSwap]);
-                        free(pile);
-                        return WorkShop;
-                    }
-                }
-                else
-                {
-                    //printf("SmthIsWrong\n");
-                }
+                res=1;
+                break;
             }
             else
             {
-                if(flagPile0equaltolast)
-                {
-                    pile[0] = Lastpile0;
-                }
-                *SizeOfWorkshopTried = 1;
-                (int*)realloc(ListOfWorkShopTried,sizeof(int)*(*SizeOfWorkshopTried));
-                ListOfWorkShopTried[0] = heaviestWorkShops;
-                int WorkShopToSwap = canNodeBeInWorkshop(WorkShop,*SizeOfWorkshops,ListOfWorkShopTried,1,pile[i],nodes,maxTiming);
-                if(WorkShopToSwap != -1)
-                {
-                    *SizeOfWorkshopTried = 2;
-                    (int*)realloc(ListOfWorkShopTried,sizeof(int)*(*SizeOfWorkshopTried));
-                    ListOfWorkShopTried[1] = WorkShopToSwap;
-                    WorkShop[heaviestWorkShops] = deletNodeFromWorkshop(WorkShop[heaviestWorkShops],pile[i]);
-                    //printf("TEST1\n");
-                    //printf("%d\n",pile[i]);
-                    WorkShop[heaviestWorkShops] = OrganisedArrayWorkshopName(WorkShop[heaviestWorkShops]);
-                    WorkShop[heaviestWorkShops].SizeOfNamesArray--;
-                    WorkShop[WorkShopToSwap].SizeOfNamesArray++;
-                    WorkShop[WorkShopToSwap].nodesNames = (int*)realloc(WorkShop[WorkShopToSwap].nodesNames,sizeof(int)*WorkShop[WorkShopToSwap].SizeOfNamesArray);
-                    WorkShop[WorkShopToSwap].nodesNames[WorkShop[WorkShopToSwap].SizeOfNamesArray-1] = pile[i];
-                    *LastNodeSwap = pile[i];
-                    *lastWorkshop = WorkShopToSwap;
-                    UpdateAllincompatibility(nodes,&WorkShop[heaviestWorkShops]);
-                    UpdateWorkshopincompatibility(nodes,pile[i],&WorkShop[WorkShopToSwap]);
-                    free(pile);
-                    return WorkShop;
-                }
-                else
-                {
-                    //printf("SmthIsWrong\n");
-                }
+                res=0;
             }
-        }
-        /// cas ou il il faut le mettre dans un autre array
-
-        WorkShop[heaviestWorkShops] = deletNodeFromWorkshop(WorkShop[heaviestWorkShops],pile[0]);
-        WorkShop[heaviestWorkShops] = OrganisedArrayWorkshopName(WorkShop[heaviestWorkShops]);
-        WorkShop[heaviestWorkShops].SizeOfNamesArray--;
-        (*SizeOfWorkshops) += 1;
-        //printf("test 3 \n");
-        WorkShop = WorkshopInnit(WorkShop,*SizeOfWorkshops);
-        //printf("Test 3 : %d",WorkShop[2].identifier);
-        WorkShop[*SizeOfWorkshops-1].SizeOfNamesArray = 1;
-        WorkShop[*SizeOfWorkshops-1].nodesNames =(int*) realloc(WorkShop[*SizeOfWorkshops-1].nodesNames,sizeof(int)*WorkShop[*SizeOfWorkshops-1].SizeOfNamesArray);
-        WorkShop[*SizeOfWorkshops-1].nodesNames[WorkShop[*SizeOfWorkshops-1].SizeOfNamesArray-1] = pile[0];
-        *LastNodeSwap = pile[0];
-        *lastWorkshop = (*SizeOfWorkshops)-1;
-        UpdateAllincompatibility(nodes,&WorkShop[heaviestWorkShops]);
-        UpdateWorkshopincompatibility(nodes,pile[0],&WorkShop[*SizeOfWorkshops-1]);
-        free(pile);
-        return WorkShop;
-    }
-    return WorkShop;
-}
-
-t_WorkShop deletNodeFromWorkshop(t_WorkShop Workshop,int node)
-{
-    for (int i = 0; i < Workshop.SizeOfNamesArray; ++i) {
-        if(Workshop.nodesNames[i] == node)
-        {
-            Workshop.nodesNames[i] = -1;
-        }
-    }
-    return Workshop;
-}
-
-t_WorkShop OrganisedArrayWorkshopName(t_WorkShop Workshop)
-{
-    int flag = 0;
-    for (int i = 0; i < Workshop.SizeOfNamesArray; ++i) {
-        if(flag == 0)
-        {
-            if(Workshop.nodesNames[i] == -1)
+            if(listearrete[i]==0)
             {
-                Workshop.nodesNames[i] = Workshop.nodesNames[i+1];
-                flag = 1;
+                j=i;
             }
         }
-        else
+        if(res==0)
         {
-            Workshop.nodesNames[i] = Workshop.nodesNames[i+1];
+            Tablo_arretes[num_arretes].arrivee=arcc->sommet;//on place les differentes valeurs dans un tableau
+            Tablo_arretes[num_arretes].depart=graphe->pSommet[num]->valeur;//on place les differentes valeurs dans un tableau
+            Tablo_arretes[num_arretes].poids=arcc->poids;//on place les differentes valeurs dans un tableau
+            listearrete[j]=temp;
+            num_arretes++;
         }
+
+        arcc=arcc->arc_suivant;
     }
-    return Workshop;
+    return num_arretes;
 }
 
-int canNodeBeInWorkshop(t_WorkShop* workShop,int SizeOfWorkshop, int* excludedWorkshop,int SizeOfExlcludedWorkshop,int node,t_node* nodes, float cycleTimeMax)
-{
-    for (int i = 0; i < SizeOfWorkshop; ++i) {
-        if(IsWorkShopExcluded(i,excludedWorkshop,SizeOfExlcludedWorkshop))
-        {
-            int compatible = 1;
-            for (int j = 0; j < workShop[i].SizeOfNodeIncompatibilityArray; ++j) {
-                if(workShop[i].nodesincompatibility[j] == node)
-                {
-                    compatible = 0;
-                }
-            }
+// Algorithme de Kruskal pour trouver un arbre couvrant minimal.
 
-            if(workShop[i].TotalTimeCycle + nodes[node].operationTime > cycleTimeMax)
-            {
-                compatible = 0;
-            }
 
-            if(compatible == 1)
-            {
-                return i;
-            }
-        }
-    }
-    return-1;
-}
-
-int IsWorkShopExcluded(int actualWorkshop,const int* Tab, int sizeofTab)
-{
-    for (int i = 0; i < sizeofTab; ++i) {
-        if(actualWorkshop == Tab[i])
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int* GetNodePriority(t_WorkShop workshop)
-{
-    int* Tab = NULL;
-    for (int i = 0; i < workshop.SizeOfNamesArray; ++i) {
-        Tab = (int*)realloc(Tab,(i+1)*sizeof(int));
-        Tab[i] = workshop.nodesNames[i];
-        sortarray(Tab,(i+1));
-    }
-    return Tab;
-}
-
-void sortarray(int* Tab,int SizeOfTab)
-{
-    for (int i = SizeOfTab-1; i > 0; i--) {
-        if(Tab[i] > Tab[i-1])
-        {
-            int buffer = Tab[i];
-            Tab[i] = Tab[i-1];
-            Tab[i-1] = buffer;
-        }
-    }
-}
-
-int FindHeaviestWorkShop(t_WorkShop* Workshops,int SizeOfWorkShops)
-{
-    float PrevTime = 0;
-    int WS = 0;
-    for (int i = 0; i < SizeOfWorkShops; ++i) {
-        if(Workshops[i].TotalTimeCycle > PrevTime && Workshops[i].SizeOfNamesArray != 1)
-        {
-            PrevTime = Workshops[i].TotalTimeCycle;
-            WS = i;
-        }
-    }
-    return WS;
-}
-
-void UpdateAllincompatibility(t_node* nodes,t_WorkShop* Workshop)
-{
-    Workshop->SizeOfNodeIncompatibilityArray = 0;
-    free(Workshop->nodesincompatibility);
-    Workshop->nodesincompatibility = NULL;
-    for (int i = 0; i < Workshop->SizeOfNamesArray; ++i) {
-        UpdateWorkshopincompatibility(nodes,Workshop->nodesNames[i],Workshop);
-    }
-}
-
-void UpdateWorkshopincompatibility(t_node* nodes,int node,t_WorkShop* Workshop)
-{
-    int flagAlreadyExiste;
-    for(int i = 0 ; i < nodes[node].Size_Of_Incompatibility_Array ; i++)
+void tableau_a(t_arrete_temp *Tablo_arretes, t_graphe *graphe) {
+    int num_arretes=0;// Initialisation du numéro d'arête à 0
+    int listearretes[graphe->taille];// Tableau des arêtes de la taille de la taille du graphe
+    for(int j=0;j<graphe->taille;j++)
     {
-        flagAlreadyExiste = 0;
-        for(int j = 0 ; j < Workshop->SizeOfNodeIncompatibilityArray ; j++)
-        {
-            if(nodes[node].inconmpatibility[i] == Workshop->nodesincompatibility[j])
-            {
-                flagAlreadyExiste = 1;
-            }
-        }
-        if (flagAlreadyExiste == 0)
-        {
-            Workshop->SizeOfNodeIncompatibilityArray++;
-            Workshop->nodesincompatibility = (int*) realloc(Workshop->nodesincompatibility,sizeof(int)*Workshop->SizeOfNodeIncompatibilityArray);
-            Workshop->nodesincompatibility[Workshop->SizeOfNodeIncompatibilityArray-1] = nodes[node].inconmpatibility[i];
-        }
+        listearretes[j]=0; // Attribution de la valeur 0 à chaque case du tableau
     }
-}
 
-t_WorkShop* WorkshopInnit(t_WorkShop* workshop,int size)
-{
-    //printf("Size : %d\n",size);
-    workshop = (t_WorkShop*)realloc(workshop,sizeof(t_WorkShop)*size);
-    workshop[size-1].TotalTimeCycle = 0;
-    workshop[size-1].identifier = size;
-    workshop[size-1].nodesNames = NULL;
-    workshop[size-1].nodesincompatibility = NULL;
-    workshop[size-1].SizeOfNamesArray = 0;
-    workshop[size-1].SizeOfNodeIncompatibilityArray = 0;
-    return workshop;
-}
 
-int PlaceNodeInWorkshop(t_WorkShop* WorkShops,int SizeOfTheWorkshop,int node)
-{
-    for(int i = 0; i < SizeOfTheWorkshop ; i++) {
-        if(CanNodeBeInWorkshop(WorkShops[i],node))
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-int CanNodeBeInWorkshop(t_WorkShop Workshop,int node)
-{
-    for (int i = 0; i < Workshop.SizeOfNodeIncompatibilityArray; ++i) {
-        if(Workshop.nodesincompatibility[i] == node)
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-long long current_time_in_ms() {
-    struct timeval te;
-    gettimeofday(&te, NULL);
-
-    long long milliseconds = te.tv_sec * 1000LL + te.tv_usec / 1000; // Calculate milliseconds
-    return milliseconds;
-}
-
-void simulation(t_WorkShop* Workshop,int SizeOfWorkshop,t_node* nodes,int SizeOfOperatioon)
-{
-    printf("Launching Simulation ...\n\n");
-    for (int i = 0; i < SizeOfWorkshop; ++i) {
-        Workshop[i].TotalTimeCycle = 0;
-    }
-    int* WorkShopOccupation = (int*)calloc(SizeOfWorkshop,sizeof(int)); /// State of occupation of the array, 1 = occupied 0 =  not occupied
-    int* OperationDone = (int*)calloc(SizeOfOperatioon,sizeof(int)); /// State of operation 0 = not done, 1 = done
-    long long TimeStart = current_time_in_ms(); /// get time for final calculation ;
-    while(IsWorkshopNotEmpty(Workshop,SizeOfWorkshop))
+    for(int i=0;i<graphe->ordre;i++)
     {
-        for (int i = 0; i < SizeOfWorkshop; ++i) {
-            if(Workshop[i].TotalTimeCycle == 0) /// not finished to do simulation
+        num_arretes=lire_pds(graphe,i,listearretes,Tablo_arretes,num_arretes);
+    }
+
+    tri_poids(graphe,Tablo_arretes);
+}
+
+
+// Fonction permettant de créer un tableau de sommet pour Kruskal
+void tableau_s(t_graphe * graphe,t_sommet_temp Tablo_sommets[]) {
+    for (int i = 0; i < graphe->ordre; i++) {
+        Tablo_sommets[i].comp_connex = i;
+        Tablo_sommets[i].num_sommet = i;
+    }
+}
+
+
+
+void Kruskal(t_graphe*  graphe)
+{
+    t_arrete_temp Tablo_arretes[graphe->taille]; // Initialisation du tableau des arêtes de la taille du graphe
+
+    t_sommet_temp t_sommet_temp[graphe->ordre];// Initialisation du tableau des sommets de la taille de l'ordre du graphe
+    int numencours=0,nbarete=0;
+    int Poids_total=0;
+
+    tableau_a(Tablo_arretes, graphe); // Appel de la fonction pour créer le tableau des arêtes
+    tableau_s(graphe, t_sommet_temp);// Appel de la fonction pour créer le tableau des sommets
+
+
+    while(numencours<graphe->ordre-1)
+    {
+        if(t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex!=t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex)
+        {
+            for(int k=0;k<graphe->ordre;k++)
             {
-                if(WorkShopOccupation[i] == 0) /// if workshop isn't done,
+                if(t_sommet_temp[k].comp_connex==t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex && t_sommet_temp[k].num_sommet!=t_sommet_temp[Tablo_arretes[nbarete].arrivee].num_sommet)
                 {
-                    Workshop[i].CurrentOperation = FindOperationNotDone(Workshop[i],OperationDone,nodes);
-                    if(Workshop[i].CurrentOperation != -1)
-                    {
-                        Workshop[i].OperationTimer = current_time_in_ms()+(long long)(nodes[Workshop[i].CurrentOperation].operationTime*1000);
-                        /// printf("%d %d %lld %lld\n",i,Workshop[i].CurrentOperation+1,Workshop[i].OperationTimer,current_time_in_ms()); /// DEBUG TiMING;
-                        WorkShopOccupation[i] = 1;
-                    }
-                }
-                else
-                {
-                    if(Workshop[i].OperationTimer <= current_time_in_ms())
-                    {
-                        OperationDone[Workshop[i].CurrentOperation] = 1;
-                        WorkShopOccupation[i] = 0;
-                        if(IsWorkShopDoneOperating(Workshop[i],OperationDone))
-                        {
-                            Workshop[i].TotalTimeCycle = (float)(current_time_in_ms()-TimeStart)/1000;
-                        }
-                    }
+                    t_sommet_temp[k].comp_connex=t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex;
                 }
             }
+//Affichage 1
+            t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex=t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex;
+            printf("\nSommet de Depart  %d ---> Sommet d'Arrivee  %d ",t_sommet_temp[Tablo_arretes[nbarete].depart].num_sommet,t_sommet_temp[Tablo_arretes[nbarete].arrivee].num_sommet);
+            Poids_total+=Tablo_arretes[nbarete].poids;
+            numencours++;
         }
+        nbarete++;
     }
-    system("cls");
-    goToXY(0,0);
-    for (int i = 0; i < SizeOfWorkshop; ++i) {
-        printf("TIME CYCLE WORKSHOP %d : %f \n",i,Workshop[i].TotalTimeCycle);
-    }
+//Affichage 2
     printf("\n\n");
-    free(OperationDone);
-    free(WorkShopOccupation);
-}
 
-int FindOperationNotDone(t_WorkShop Workshop,const int* OperationArray,t_node* nodes)
-{
-    for (int i = 0; i < Workshop.SizeOfNamesArray; ++i) {
-        if(OperationArray[Workshop.nodesNames[i]] == 0)
-        {
-            if(canNodeBeProcessedWithPrecedence(OperationArray,nodes,Workshop.nodesNames[i]))
-            {
-                return Workshop.nodesNames[i];
-            }
-        }
-    }
-    return -1;
-}
-
-int canNodeBeProcessedWithPrecedence(const int* OperationArray,t_node* nodes,int node)
-{
-    for (int i = 0; i < nodes[node].Size_Of_Previous_Array; ++i) {
-        if(OperationArray[nodes[node].prevnode[i]] == 0)
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int IsWorkShopDoneOperating(t_WorkShop Workshop,const int* OperationArray)
-{
-    for (int i = 0; i < Workshop.SizeOfNamesArray; ++i) {
-        if(OperationArray[Workshop.nodesNames[i]] == 0)
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int IsWorkshopNotEmpty(t_WorkShop* Workshop,int SizeOfWorkshop){
-    for(int i = 0 ; i < SizeOfWorkshop ; i ++)
+    for(int j=0;j<graphe->ordre;j++)
     {
-        if(Workshop[i].TotalTimeCycle == 0)
-        {
-            return 1;
-        }
+        printf("\n\tSommet : %d = composante connexe %d",t_sommet_temp[j].num_sommet,t_sommet_temp[j].comp_connex);
     }
-    return 0;
+
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
 }
+
+void Kruskal(t_graphe*  graphe)
+{
+    t_arrete_temp Tablo_arretes[graphe->taille]; // Initialisation du tableau des arêtes de la taille du graphe
+
+    t_sommet_temp t_sommet_temp[graphe->ordre];// Initialisation du tableau des sommets de la taille de l'ordre du graphe
+    int numencours=0,nbarete=0;
+    int Poids_total=0;
+
+    tableau_a(Tablo_arretes, graphe); // Appel de la fonction pour créer le tableau des arêtes
+    tableau_s(graphe, t_sommet_temp);// Appel de la fonction pour créer le tableau des sommets
+
+
+    while(numencours<graphe->ordre-1)
+    {
+        if(t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex!=t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex)
+        {
+            for(int k=0;k<graphe->ordre;k++)
+            {
+                if(t_sommet_temp[k].comp_connex==t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex && t_sommet_temp[k].num_sommet!=t_sommet_temp[Tablo_arretes[nbarete].arrivee].num_sommet)
+                {
+                    t_sommet_temp[k].comp_connex=t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex;
+                }
+            }
+//Affichage 1
+            t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex=t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex;
+            printf("\nSommet de Depart  %d ---> Sommet d'Arrivee  %d ",t_sommet_temp[Tablo_arretes[nbarete].depart].num_sommet,t_sommet_temp[Tablo_arretes[nbarete].arrivee].num_sommet);
+            Poids_total+=Tablo_arretes[nbarete].poids;
+            numencours++;
+        }
+        nbarete++;
+    }
+//Affichage 2
+    printf("\n\n");
+
+    for(int j=0;j<graphe->ordre;j++)
+    {
+        printf("\n\tSommet : %d = composante connexe %d",t_sommet_temp[j].num_sommet,t_sommet_temp[j].comp_connex);
+    }
+
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+}
+
+//Affichage 1
+            t_sommet_temp[Tablo_arretes[nbarete].arrivee].comp_connex=t_sommet_temp[Tablo_arretes[nbarete].depart].comp_connex;
+            printf("\nSommet de Depart  %d ---> Sommet d'Arrivee  %d ",t_sommet_temp[Tablo_arretes[nbarete].depart].num_sommet,t_sommet_temp[Tablo_arretes[nbarete].arrivee].num_sommet);
+            Poids_total+=Tablo_arretes[nbarete].poids;
+            numencours++;
+        }
+        nbarete++;
+    }
+//Affichage 2
+    printf("\n\n");
+
+    for(int j=0;j<graphe->ordre;j++)
+    {
+        printf("\n\tSommet : %d = composante connexe %d",t_sommet_temp[j].num_sommet,t_sommet_temp[j].comp_connex);
+    }
+
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+    printf("\n\npoids total :  %d\n\n",Poids_total);
+}
+
 
 
