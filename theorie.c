@@ -51,7 +51,7 @@ t_node* readfileOperationFile(char FileName[], int* SizeOfOperation){
     fclose(FIle);
     return nodes;
 }
-
+//readfileTimeCycle//
 float readfileTimeCycle(char FileName[]){
     FILE* FIle;
     float num1;
