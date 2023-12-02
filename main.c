@@ -819,7 +819,7 @@ int IsWorkShopDoneOperating(t_WorkShop Workshop,const int* OperationArray)
     }
     return 1;
 }
-
+//init workshop//
 int IsWorkshopNotEmpty(t_WorkShop* Workshop,int SizeOfWorkshop){
     for(int i = 0 ; i < SizeOfWorkshop ; i ++)
     {
