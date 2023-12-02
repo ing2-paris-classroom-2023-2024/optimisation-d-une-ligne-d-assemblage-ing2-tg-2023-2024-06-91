@@ -1,7 +1,6 @@
 //
 // Created by boraz on 26/11/2023.
 //
-
 #ifndef OPTIMISATION_D_UNE_LIGNE_D_ASSEMBLAGE_ING2_TG_2023_2024_06_91_HEADER_H
 #define OPTIMISATION_D_UNE_LIGNE_D_ASSEMBLAGE_ING2_TG_2023_2024_06_91_HEADER_H
 
@@ -79,6 +78,7 @@ void goToXY( int col, int lig);
 void LaunchWorkshopOrganizer(t_pointers* Organisation);
 
 #endif //OPTIMISATION_D_UNE_LIGNE_D_ASSEMBLAGE_ING2_TG_2023_2024_06_91_HEADER_H
+
 
 
 
