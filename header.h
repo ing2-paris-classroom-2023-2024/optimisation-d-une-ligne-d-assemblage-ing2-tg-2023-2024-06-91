@@ -44,6 +44,7 @@ typedef struct WorkShop
     int* nodesincompatibility;
 } t_WorkShop;
 
+//prototype sous programme//
 t_node* readfileOperationFile(char FileName[], int* SizeOfOperation);
 int** readfileexclusionsandlink(char FileName[],int* SizeOfExclusion);
 void Free_Double_Array(int** Tab,int size);
