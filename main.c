@@ -1,6 +1,6 @@
 /***********************************************BORAZ BOUCHANE VALLETTE SETTBON**************************************************************************/
 /********************************PROJET théorie des graphes : optimisation d'une ligne d'assemblage groupe 91******************************************************/
-/********************************************** sources TP et cours de boostcamp************************************************************************************/
+/********************************************** sources TP et cours de boostcamp ************************************************************************************/
 
 #include "header.h"
 
@@ -266,6 +266,7 @@ void ReadWorkshop(t_WorkShop* WorkShops,int size,t_node* nodes){
     for(int i = 0 ; i < size; i++)
     {
         printf("WorkShop %d \n",WorkShops[i].identifier);
+        printf("time cycle : %f \n", WorkShops[i].TotalTimeCycle);
         printf("Number of incompatible node : %d\n",WorkShops[i].SizeOfNodeIncompatibilityArray);
         for (int j = 0; j < WorkShops[i].SizeOfNodeIncompatibilityArray; ++j) {
             printf("%d ",nodes[WorkShops[i].nodesincompatibility[j]].IdNumber);
