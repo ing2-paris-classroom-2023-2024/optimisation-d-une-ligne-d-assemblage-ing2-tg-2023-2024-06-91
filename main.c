@@ -370,7 +370,7 @@ t_WorkShop* SetupWorkshop(t_node* nodes,int SizeOfNode,int* SizeWorkshop)
 
 float CalculMinimumTimeCycleforOperation(t_node* nodes, int pointer)
 {
-    float Time = (float)INT_MAX;
+    float Time = (float)1000000;
     for (int i = 0; i < nodes[pointer].Size_Of_Previous_Array; ++i) {
         float nextTIme =  CalculMinimumTimeCycleforOperation(nodes,nodes[pointer].prevnode[i]);
         if(nextTIme < Time)
