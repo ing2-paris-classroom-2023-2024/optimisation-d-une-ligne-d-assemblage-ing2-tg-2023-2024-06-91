@@ -320,7 +320,6 @@ void InstallExclusionToStructur(t_node* nodes,int SizeOfNode){
     }
     Free_Double_Array(exclusionArray,SizeOfExclusion);
 }
-
 void InstallPrecedenceToStructur(t_node* nodes,int SizeOfNode){
     int SizeOfPrecedence;
     int** PrecedenceArray = readfileexclusionsandlink("precedences.txt",&SizeOfPrecedence);
@@ -335,6 +334,8 @@ void InstallPrecedenceToStructur(t_node* nodes,int SizeOfNode){
     }
     Free_Double_Array(PrecedenceArray,SizeOfPrecedence);
 }
+
+
 
 t_WorkShop* SetupWorkshop(t_node* nodes,int SizeOfNode,int* SizeWorkshop)
 {
