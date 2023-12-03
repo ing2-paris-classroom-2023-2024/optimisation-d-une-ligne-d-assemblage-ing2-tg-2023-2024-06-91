@@ -2,6 +2,7 @@
 // Created by boraz on 22/11/2023.
 //
 #include <stdio.h>
+#include <windows.h>
 #include <stdlib.h>
 #include "header.h"
 
@@ -13,6 +14,7 @@ int** readfileexclusionsandlink(char FileName[],int* SizeOfExclusion){
     FIle = fopen(FileName, "r");
     if (FIle == NULL) {
         perror("Error opening the file");
+        Sleep(2000);
         exit(-1);
     }
     while (fscanf(FIle, "%d %d", &num1,&num2) == 2) {
@@ -39,6 +41,7 @@ t_node* readfileOperationFile(char FileName[], int* SizeOfOperation){
     FIle = fopen(FileName, "r");
     if (FIle == NULL) {
         perror("Error opening the file");
+        Sleep(2000);
         exit(-1);
     }
     while (fscanf(FIle, "%d %f", &num1,&num2) == 2) {
@@ -58,6 +61,7 @@ float readfileTimeCycle(char FileName[]){
     FIle = fopen(FileName, "r");
     if (FIle == NULL) {
         perror("Error opening the file");
+        Sleep(2000);
         exit(-1);
     }
     fscanf(FIle, "%f", &num1);

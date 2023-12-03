@@ -194,6 +194,7 @@ void verifWorkshop(t_WorkShop* Workshop,int SizeofWorkshop,int SizeOfNod)
             else
             {
                 printf("An Error has occurred, Node in 2 Different Workshop\n");
+                Sleep(2000);
                 exit(-999);
             }
         }
@@ -308,7 +309,7 @@ void InstallExclusionToStructur(t_node* nodes,int SizeOfNode){
     {
         int NodeA = FindIndexOfIdName(exclusionArray[i][0],nodes,SizeOfNode);
         int NodeB = FindIndexOfIdName(exclusionArray[i][1],nodes,SizeOfNode);
-        if(NodeA == -1 || NodeB == -1){ printf("Exception: an operation didn't existe in the file Operation.txt");exit(-2);}
+        if(NodeA == -1 || NodeB == -1){ printf("Exception: an operation didn't existe in the file Operation.txt");Sleep(2000);exit(-2);}
         nodes[NodeA].Size_Of_Incompatibility_Array++;
         nodes[NodeB].Size_Of_Incompatibility_Array++;
         nodes[NodeA].inconmpatibility = (int*) realloc(nodes[NodeA].inconmpatibility,sizeof(int)*nodes[NodeA].Size_Of_Incompatibility_Array);
@@ -326,7 +327,7 @@ void InstallPrecedenceToStructur(t_node* nodes,int SizeOfNode){
     {
         int NodeA = FindIndexOfIdName(PrecedenceArray[i][0],nodes,SizeOfNode);
         int NodeB = FindIndexOfIdName(PrecedenceArray[i][1],nodes,SizeOfNode);
-        if(NodeA == -1 || NodeB == -1){ printf("Exception: an operation didn't existe in the file Operation.txt");exit(-2);}
+        if(NodeA == -1 || NodeB == -1){ printf("Exception: an operation didn't existe in the file Operation.txt");Sleep(2000);exit(-2);}
         nodes[NodeB].Size_Of_Previous_Array++;
         nodes[NodeB].prevnode = (int*) realloc(nodes[NodeB].prevnode,sizeof(int)*nodes[NodeB].Size_Of_Previous_Array);
         nodes[NodeB].prevnode[nodes[NodeB].Size_Of_Previous_Array-1]=NodeA;
@@ -435,6 +436,7 @@ t_WorkShop* Verify_or_reorganise_WorkShops(t_WorkShop* WorkShop,int* SizeOfWorks
             if(IsWorkshopWithSingleNodePossible(WorkShop,*SizeOfWorkshops,nodes,maxTiming))
             {
                 printf("Can't Find Optimization for this TimeCycle");
+                Sleep(2000);
                 exit(4);
             }
         }
